@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyectos - Crowdfunding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav id="mainNav"></nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">Explorar Proyectos</h1>
+          <p class="text-muted">Descubre <span id="totalCount">0</span> proyectos increíbles esperando tu apoyo</p>
+        </div>
+      </div>
+
+      <div class="card mb-6" style="background: var(--muted); border: none;">
+        <div class="card-content">
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <input type="text" id="searchInput" class="input" placeholder="Buscar proyectos..." onkeyup="filterProjects()">
+            </div>
+            <div>
+              <select id="categoryFilter" class="select" onchange="filterProjects()">
+                <option value="all">Todas las categorías</option>
+              </select>
+            </div>
+            <div>
+              <select id="sortBy" class="select" onchange="filterProjects()">
+                <option value="newest">Más recientes</option>
+                <option value="ending_soon">Terminan pronto</option>
+                <option value="most_funded">Más financiados</option>
+                <option value="goal_amount">Meta más alta</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="card">
+          <div class="card-content">
+            <div class="stat-value" id="filteredCount">0</div>
+            <div class="stat-label">Proyectos disponibles</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="stat-value" id="totalFunded">$0</div>
+            <div class="stat-label">Total recaudado</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="stat-value" id="successRate">0%</div>
+            <div class="stat-label">Tasa de éxito</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="activeFilters" class="mb-4 hidden">
+        <span class="text-sm">Filtros activos:</span>
+      </div>
+
+      <div id="projectsGrid" class="grid grid-cols-3 gap-6"></div>
+
+      <div id="noResults" class="text-center hidden" style="padding: 80px 0;">
+        <p class="text-muted mb-4">No se encontraron proyectos que coincidan con tus filtros.</p>
+        <button class="btn btn-outline" onclick="clearFilters()">Limpiar filtros</button>
+      </div>
+
+      <div class="card mt-6" style="background: #eff6ff; border-color: #bfdbfe;">
+        <div class="card-content">
+          <h3 style="font-weight: 600; color: #1e40af; margin-bottom: 12px;">¿Cómo contribuir a un proyecto?</h3>
+          <ol class="text-sm" style="color: #1e40af; padding-left: 20px;">
+            <li>Haz clic en "Ver Detalles" de cualquier proyecto que te interese</li>
+            <li>En la página del proyecto, encontrarás el botón "Contribuir Ahora" en el panel lateral</li>
+            <li>Selecciona la cantidad que deseas aportar y deja un mensaje opcional</li>
+            <li>Confirma tu contribución y ¡listo! Habrás apoyado una gran idea</li>
+          </ol>
+          <p class="text-xs mt-2" style="color: #1e3a8a;">💳 Nota: Solo se puede contribuir a proyectos publicados con campañas activas.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+  (function(){ if (typeof window.updateNavigation === 'function') return; 
+  if (typeof window.logout !== 'function') window.logout = function(){};
+    function _getNavUser(){ if (typeof getCurrentUser === 'function'){ try{ const u = getCurrentUser(); if (u) return u; }catch(e){} } return { name: 'Usuario Demo', email: 'demo@ejemplo.com', role: 'user' }; }
+    window.updateNavigation = function(){ const nav = document.getElementById('mainNav'); if (!nav) return; const user = _getNavUser(); if (!user){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="login.html" class="btn btn-primary">Iniciar Sesión</a>`; } else if (user.role === 'admin'){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="admin-projects.html">Gestión Proyectos</a><a href="admin-users.html">Gestión Usuarios</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">Administrador</span><div class="separator" style="margin: 8px 0;"></div><a href="favorites.html" class="dropdown-item">Favoritos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } else { nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="my-projects.html">Mis Proyectos</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">${user.email}</span><div class="separator" style="margin: 8px 0;"></div><a href="my-projects.html" class="dropdown-item">Mis Proyectos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><a href="favorites.html" class="dropdown-item">Favoritos</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } };
+    window.toggleUserMenu = function(){ const dropdown = document.getElementById('userDropdown'); if (dropdown) dropdown.classList.toggle('active'); };
+    document.addEventListener('click', function(e){ const userMenu = document.querySelector('.user-menu'); const dropdown = document.getElementById('userDropdown'); if (userMenu && dropdown && !userMenu.contains(e.target)) dropdown.classList.remove('active'); });
+    window.toggleFavorite = function(projectId){ if (!Array.isArray(window.projects)) return; const p = projects.find(p=>p.id===projectId); if (p) p.isFavorite = !p.isFavorite; };
+    window.formatDate = function(dateString){ try{ const d = new Date(dateString); return d.toLocaleDateString('es-ES',{ year: 'numeric', month: 'long', day: 'numeric' }); }catch(e){ return dateString; } };
+    window.getDaysLeft = function(deadlineString){ try{ const deadline = new Date(deadlineString); const today = new Date(); const diffTime = deadline - today; return Math.ceil(diffTime/(1000*60*60*24)); }catch(e){ return 0; } };
+    window.getStatusBadge = function(status){ const statusMap = { draft: { label: 'Borrador', class: 'badge-secondary' }, under_review: { label: 'En Revisión', class: 'badge-primary' }, published: { label: 'Publicado', class: 'badge-success' }, observed: { label: 'Observado', class: 'badge-warning' }, rejected: { label: 'Rechazado', class: 'badge-destructive' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.getCampaignStatusBadge = function(status){ const statusMap = { not_started: { label: 'No Iniciada', class: 'badge-secondary' }, in_progress: { label: 'En Progreso', class: 'badge-success' }, paused: { label: 'En Pausa', class: 'badge-warning' }, finished: { label: 'Finalizada', class: 'badge-secondary' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.requireAuth = function(){ return true; };
+    window.requireAdmin = function(){ return true; };
+  })();
+  </script>
+  <script>
+    let currentFilters = {
+      search: '',
+      category: 'all',
+      sortBy: 'newest'
+    };
+
+    function initPage() {
+      updateNavigation();
+      loadCategories();
+      filterProjects();
+    }
+
+    function loadCategories() {
+      const select = document.getElementById('categoryFilter');
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.name;
+        option.textContent = cat.name;
+        select.appendChild(option);
+      });
+    }
+
+    function filterProjects() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      const sortBy = document.getElementById('sortBy').value;
+
+      currentFilters = { search, category, sortBy };
+
+      let filtered = projects.filter(p => p.status === 'published');
+
+      if (search) {
+        filtered = filtered.filter(p =>
+          p.title.toLowerCase().includes(search) ||
+          p.description.toLowerCase().includes(search)
+        );
+      }
+
+      if (category !== 'all') {
+        filtered = filtered.filter(p => p.category === category);
+      }
+
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'newest':
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          case 'ending_soon':
+            return new Date(a.deadline) - new Date(b.deadline);
+          case 'most_funded':
+            return b.currentAmount - a.currentAmount;
+          case 'goal_amount':
+            return b.fundingGoal - a.fundingGoal;
+          default:
+            return 0;
+        }
+      });
+
+      renderProjects(filtered);
+      updateStats(filtered);
+      updateActiveFilters();
+    }
+
+    function renderProjects(projectsList) {
+      const grid = document.getElementById('projectsGrid');
+      const noResults = document.getElementById('noResults');
+
+      if (projectsList.length === 0) {
+        grid.innerHTML = '';
+        grid.classList.add('hidden');
+        noResults.classList.remove('hidden');
+        return;
+      }
+
+      grid.classList.remove('hidden');
+      noResults.classList.add('hidden');
+      grid.innerHTML = '';
+
+      projectsList.forEach(project => {
+        const progress = (project.currentAmount / project.fundingGoal * 100).toFixed(0);
+        const daysLeft = Math.ceil((new Date(project.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+
+        grid.innerHTML += `
+          <div class="project-card" onclick="window.location.href='project-detail.html?id=${project.id}'">
+            <img src="${project.image}" alt="${project.title}" class="project-image">
+            <div class="project-body">
+              <div class="project-category">
+                <span class="badge badge-outline">${project.category}</span>
+              </div>
+              <h3 class="project-title">${project.title}</h3>
+              <p class="project-description">${project.description}</p>
+              <div class="progress mt-4">
+                <div class="progress-bar" style="width: ${progress}%"></div>
+              </div>
+              <div class="flex justify-between text-sm mt-2">
+                <span style="font-weight: 600; color: var(--primary);">$${project.currentAmount.toLocaleString()}</span>
+                <span class="text-muted">${progress}% financiado</span>
+              </div>
+              <div class="flex justify-between text-sm mt-2">
+                <span class="text-muted">Meta: $${project.fundingGoal.toLocaleString()}</span>
+                <span class="text-muted">${daysLeft > 0 ? daysLeft + ' días' : 'Finalizado'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function updateStats(projectsList) {
+      const publishedProjects = projects.filter(p => p.status === 'published');
+      
+      document.getElementById('totalCount').textContent = publishedProjects.length;
+      document.getElementById('filteredCount').textContent = projectsList.length;
+      
+      const totalFunded = publishedProjects.reduce((sum, p) => sum + p.currentAmount, 0);
+      document.getElementById('totalFunded').textContent = '$' + totalFunded.toLocaleString();
+      
+      const successCount = publishedProjects.filter(p => p.currentAmount >= p.fundingGoal).length;
+      const successRate = publishedProjects.length > 0 
+        ? Math.round((successCount / publishedProjects.length) * 100) 
+        : 0;
+      document.getElementById('successRate').textContent = successRate + '%';
+    }
+
+    function updateActiveFilters() {
+      const container = document.getElementById('activeFilters');
+      const hasFilters = currentFilters.search || currentFilters.category !== 'all';
+
+      if (!hasFilters) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      let html = '<span class="text-sm">Filtros activos:</span> ';
+
+      if (currentFilters.search) {
+        html += `<span class="badge badge-secondary" style="cursor: pointer; margin-left: 8px;" onclick="clearSearch()">Búsqueda: "${currentFilters.search}" ×</span>`;
+      }
+
+      if (currentFilters.category !== 'all') {
+        html += `<span class="badge badge-secondary" style="cursor: pointer; margin-left: 8px;" onclick="clearCategory()">Categoría: ${currentFilters.category} ×</span>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      filterProjects();
+    }
+
+    function clearCategory() {
+      document.getElementById('categoryFilter').value = 'all';
+      filterProjects();
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = 'all';
+      filterProjects();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

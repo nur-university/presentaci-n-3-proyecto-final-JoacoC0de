@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Usuarios - Admin</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav id="mainNav"></nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-3">
+          <span style="font-size: 32px;" aria-hidden="true"></span>
+          <div>
+            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">Gestión de Administradores</h1>
+            <p class="text-muted">Crear, editar y gestionar usuarios administradores</p>
+          </div>
+        </div>
+  <button class="btn btn-primary" onclick="openCreateModal()">+ Nuevo Administrador</button>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Administradores</div>
+            <div style="font-size: 24px; font-weight: 700;" id="adminCount">0</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Usuarios Regulares</div>
+            <div style="font-size: 24px; font-weight: 700;" id="userCount">0</div>
+          </div>
+        </div>
+        <div class="card" style="background: #dcfce7; border-color: #22c55e;">
+          <div class="card-content">
+            <div class="text-sm mb-2" style="color: #166534;">Usuarios Activos</div>
+            <div style="font-size: 24px; font-weight: 700; color: #166534;" id="activeCount">0</div>
+          </div>
+        </div>
+        <div class="card" style="background: #fee2e2; border-color: #ef4444;">
+          <div class="card-content">
+            <div class="text-sm mb-2" style="color: #991b1b;">Usuarios Inactivos</div>
+            <div style="font-size: 24px; font-weight: 700; color: #991b1b;" id="inactiveCount">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-6">
+        <div class="card-header">
+            <h3 style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span aria-hidden="true"></span>
+            <span>Administradores del Sistema</span>
+          </h3>
+        </div>
+        <div class="card-content" id="adminsList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+            <h3 style="font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span aria-hidden="true"></span>
+            <span>Resumen de Usuarios Regulares</span>
+          </h3>
+        </div>
+        <div class="card-content">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <h4 style="font-weight: 500; margin-bottom: 16px; color: #166534;">Usuarios Activos (<span id="activeUserCount">0</span>)</h4>
+              <div id="activeUsersList"></div>
+            </div>
+            <div>
+              <h4 style="font-weight: 500; margin-bottom: 16px; color: #991b1b;">Usuarios Inactivos (<span id="inactiveUserCount">0</span>)</h4>
+              <div id="inactiveUsersList"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-6" style="background: #eff6ff; border-color: #bfdbfe;">
+        <div class="card-content">
+          <h4 style="font-weight: 500; color: #1e40af; margin-bottom: 12px;">Información Importante</h4>
+          <ul class="text-sm" style="color: #1e40af; list-style: none;">
+            <li>• Los administradores se crean con cuenta activa automáticamente</li>
+            <li>• Los usuarios regulares deben activar su cuenta por correo electrónico</li>
+            <li>• No puedes eliminar tu propia cuenta de administrador</li>
+            <li>• Los administradores tienen acceso completo a todas las funciones del sistema</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Crear Nuevo Administrador</h2>
+        <button class="modal-close" onclick="closeUserModal()">×</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label class="label">Nombre Completo</label>
+          <input type="text" id="userName" class="input" placeholder="Nombre del administrador">
+        </div>
+        <div class="form-group">
+          <label class="label">Correo Electrónico</label>
+          <input type="email" id="userEmail" class="input" placeholder="admin@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label class="label">Contraseña</label>
+          <input type="password" id="userPassword" class="input" placeholder="Contraseña temporal">
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-primary" style="flex: 1;" onclick="saveUser()">Crear Administrador</button>
+          <button class="btn btn-outline" style="flex: 1;" onclick="closeUserModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+  (function(){ if (typeof window.updateNavigation === 'function') return; 
+  if (typeof window.logout !== 'function') window.logout = function(){};
+    function _getNavUser(){ if (typeof getCurrentUser === 'function'){ try{ const u = getCurrentUser(); if (u) return u; }catch(e){} } return { name: 'Usuario Demo', email: 'demo@ejemplo.com', role: 'user' }; }
+    window.updateNavigation = function(){ const nav = document.getElementById('mainNav'); if (!nav) return; const user = _getNavUser(); if (!user){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="login.html" class="btn btn-primary">Iniciar Sesión</a>`; } else if (user.role === 'admin'){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="admin-projects.html">Gestión Proyectos</a><a href="admin-users.html">Gestión Usuarios</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">Administrador</span><div class="separator" style="margin: 8px 0;"></div><a href="favorites.html" class="dropdown-item">Favoritos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } else { nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="my-projects.html">Mis Proyectos</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">${user.email}</span><div class="separator" style="margin: 8px 0;"></div><a href="my-projects.html" class="dropdown-item">Mis Proyectos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><a href="favorites.html" class="dropdown-item">Favoritos</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } };
+    window.toggleUserMenu = function(){ const dropdown = document.getElementById('userDropdown'); if (dropdown) dropdown.classList.toggle('active'); };
+    document.addEventListener('click', function(e){ const userMenu = document.querySelector('.user-menu'); const dropdown = document.getElementById('userDropdown'); if (userMenu && dropdown && !userMenu.contains(e.target)) dropdown.classList.remove('active'); });
+    window.toggleFavorite = function(projectId){ if (!Array.isArray(window.projects)) return; const p = projects.find(p=>p.id===projectId); if (p) p.isFavorite = !p.isFavorite; };
+    window.formatDate = function(dateString){ try{ const d = new Date(dateString); return d.toLocaleDateString('es-ES',{ year: 'numeric', month: 'long', day: 'numeric' }); }catch(e){ return dateString; } };
+    window.getDaysLeft = function(deadlineString){ try{ const deadline = new Date(deadlineString); const today = new Date(); const diffTime = deadline - today; return Math.ceil(diffTime/(1000*60*60*24)); }catch(e){ return 0; } };
+    window.getStatusBadge = function(status){ const statusMap = { draft: { label: 'Borrador', class: 'badge-secondary' }, under_review: { label: 'En Revisión', class: 'badge-primary' }, published: { label: 'Publicado', class: 'badge-success' }, observed: { label: 'Observado', class: 'badge-warning' }, rejected: { label: 'Rechazado', class: 'badge-destructive' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.getCampaignStatusBadge = function(status){ const statusMap = { not_started: { label: 'No Iniciada', class: 'badge-secondary' }, in_progress: { label: 'En Progreso', class: 'badge-success' }, paused: { label: 'En Pausa', class: 'badge-warning' }, finished: { label: 'Finalizada', class: 'badge-secondary' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.requireAuth = function(){ return true; };
+    window.requireAdmin = function(){ return true; };
+  })();
+  </script>
+  <script>
+    function initPage() {
+      if (!requireAdmin()) return;
+      updateNavigation();
+      loadData();
+    }
+
+    function loadData() {
+      const adminUsers = users.filter(u => u.role === 'admin');
+      const regularUsers = users.filter(u => u.role === 'user');
+      const activeUsers = users.filter(u => u.isActive);
+      const inactiveUsers = users.filter(u => !u.isActive);
+      const currentUser = getCurrentUser();
+
+      document.getElementById('adminCount').textContent = adminUsers.length;
+      document.getElementById('userCount').textContent = regularUsers.length;
+      document.getElementById('activeCount').textContent = activeUsers.length;
+      document.getElementById('inactiveCount').textContent = inactiveUsers.length;
+
+      const adminsList = document.getElementById('adminsList');
+      adminsList.innerHTML = adminUsers.map(user => `
+        <div class="flex justify-between items-center mb-4 pb-4" style="border-bottom: 1px solid var(--border);">
+          <div class="flex items-center gap-4">
+            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+              ${user.name.charAt(0)}
+            </div>
+            <div>
+              <h4 style="font-weight: 600;">${user.name}</h4>
+              <div class="flex items-center gap-2 text-sm text-muted">
+                <span>${user.email}</span>
+                ${user.isActive ? 
+                  '<span class="badge badge-success">Activo</span>' : 
+                  '<span class="badge badge-secondary">Inactivo</span>'}
+                ${user.id === currentUser.id ? 
+                  '<span class="badge badge-outline">Tú</span>' : ''}
+              </div>
+            </div>
+          </div>
+            <div class="flex gap-2">
+            <button class="btn btn-outline btn-sm" ${user.id === currentUser.id ? 'disabled' : ''}>Editar</button>
+            <button class="btn btn-outline btn-sm" style="color: var(--destructive);" ${user.id === currentUser.id ? 'disabled' : ''} onclick="deleteAdmin('${user.id}')">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+
+      const activeUsersFiltered = regularUsers.filter(u => u.isActive);
+      const inactiveUsersFiltered = regularUsers.filter(u => !u.isActive);
+
+      document.getElementById('activeUserCount').textContent = activeUsersFiltered.length;
+      document.getElementById('inactiveUserCount').textContent = inactiveUsersFiltered.length;
+
+      document.getElementById('activeUsersList').innerHTML = activeUsersFiltered.map(user => `
+        <div class="flex justify-between items-center mb-2 p-2" style="background: #dcfce7; border-radius: 6px;">
+          <div>
+            <span style="font-weight: 500;">${user.name}</span>
+            <span class="text-sm text-muted ml-2">${user.email}</span>
+          </div>
+          <span class="badge badge-success">Activo</span>
+        </div>
+      `).join('');
+
+      document.getElementById('inactiveUsersList').innerHTML = inactiveUsersFiltered.map(user => `
+        <div class="flex justify-between items-center mb-2 p-2" style="background: #fee2e2; border-radius: 6px;">
+          <div>
+            <span style="font-weight: 500;">${user.name}</span>
+            <span class="text-sm text-muted ml-2">${user.email}</span>
+          </div>
+          <span class="badge badge-secondary">Inactivo</span>
+        </div>
+      `).join('');
+    }
+
+    function openCreateModal() {
+      document.getElementById('userModal').classList.add('active');
+      document.getElementById('modalTitle').textContent = 'Crear Nuevo Administrador';
+      document.getElementById('userName').value = '';
+      document.getElementById('userEmail').value = '';
+      document.getElementById('userPassword').value = '';
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.remove('active');
+    }
+
+    function saveUser() {
+      const name = document.getElementById('userName').value;
+      const email = document.getElementById('userEmail').value;
+      const password = document.getElementById('userPassword').value;
+
+      if (!name || !email || !password) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
+
+      console.log('Crear administrador:', { name, email, password });
+      alert('Administrador creado exitosamente');
+      closeUserModal();
+    }
+
+    function deleteAdmin(userId) {
+      const currentUser = getCurrentUser();
+      if (userId === currentUser.id) {
+        alert('No puedes eliminar tu propia cuenta');
+        return;
+      }
+      
+      if (confirm('¿Estás seguro de que quieres eliminar este administrador?')) {
+        console.log('Eliminar administrador:', userId);
+        alert('Administrador eliminado');
+      }
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
