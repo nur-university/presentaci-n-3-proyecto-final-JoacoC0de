@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Proyectos - Crowdfunding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav id="mainNav"></nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">Mis Proyectos</h1>
+          <p class="text-muted">Gestiona y monitorea todos tus proyectos</p>
+        </div>
+  <button class="btn btn-primary">+ Nuevo Proyecto</button>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4 mb-6" id="statsGrid"></div>
+
+      <div class="flex items-center gap-4 mb-6">
+        <span class="text-sm" style="font-weight: 500;">Filtrar por estado:</span>
+        <select id="statusFilter" class="select" style="width: 200px;" onchange="filterProjects()">
+          <option value="all">Todos los estados</option>
+          <option value="draft">Borrador</option>
+          <option value="under_review">En Revisión</option>
+          <option value="published">Publicado</option>
+          <option value="observed">Observado</option>
+          <option value="rejected">Rechazado</option>
+        </select>
+      </div>
+
+      <div id="projectsList"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+  (function(){ if (typeof window.updateNavigation === 'function') return; 
+  if (typeof window.logout !== 'function') window.logout = function(){};
+    function _getNavUser(){ if (typeof getCurrentUser === 'function'){ try{ const u = getCurrentUser(); if (u) return u; }catch(e){} } return { name: 'Usuario Demo', email: 'demo@ejemplo.com', role: 'user' }; }
+    window.updateNavigation = function(){ const nav = document.getElementById('mainNav'); if (!nav) return; const user = _getNavUser(); if (!user){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="login.html" class="btn btn-primary">Iniciar Sesión</a>`; } else if (user.role === 'admin'){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="admin-projects.html">Gestión Proyectos</a><a href="admin-users.html">Gestión Usuarios</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">Administrador</span><div class="separator" style="margin: 8px 0;"></div><a href="favorites.html" class="dropdown-item">Favoritos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } else { nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="my-projects.html">Mis Proyectos</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">${user.email}</span><div class="separator" style="margin: 8px 0;"></div><a href="my-projects.html" class="dropdown-item">Mis Proyectos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><a href="favorites.html" class="dropdown-item">Favoritos</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } };
+    window.toggleUserMenu = function(){ const dropdown = document.getElementById('userDropdown'); if (dropdown) dropdown.classList.toggle('active'); };
+    document.addEventListener('click', function(e){ const userMenu = document.querySelector('.user-menu'); const dropdown = document.getElementById('userDropdown'); if (userMenu && dropdown && !userMenu.contains(e.target)) dropdown.classList.remove('active'); });
+    window.toggleFavorite = function(projectId){ if (!Array.isArray(window.projects)) return; const p = projects.find(p=>p.id===projectId); if (p) p.isFavorite = !p.isFavorite; };
+    window.formatDate = function(dateString){ try{ const d = new Date(dateString); return d.toLocaleDateString('es-ES',{ year: 'numeric', month: 'long', day: 'numeric' }); }catch(e){ return dateString; } };
+    window.getDaysLeft = function(deadlineString){ try{ const deadline = new Date(deadlineString); const today = new Date(); const diffTime = deadline - today; return Math.ceil(diffTime/(1000*60*60*24)); }catch(e){ return 0; } };
+    window.getStatusBadge = function(status){ const statusMap = { draft: { label: 'Borrador', class: 'badge-secondary' }, under_review: { label: 'En Revisión', class: 'badge-primary' }, published: { label: 'Publicado', class: 'badge-success' }, observed: { label: 'Observado', class: 'badge-warning' }, rejected: { label: 'Rechazado', class: 'badge-destructive' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.getCampaignStatusBadge = function(status){ const statusMap = { not_started: { label: 'No Iniciada', class: 'badge-secondary' }, in_progress: { label: 'En Progreso', class: 'badge-success' }, paused: { label: 'En Pausa', class: 'badge-warning' }, finished: { label: 'Finalizada', class: 'badge-secondary' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.requireAuth = function(){ return true; };
+    window.requireAdmin = function(){ return true; };
+  })();
+  </script>
+  <script>
+    function initPage() {
+      if (!requireAuth()) return;
+      updateNavigation();
+      renderStats();
+      filterProjects();
+    }
+
+    function renderStats() {
+      const user = getCurrentUser();
+      const userProjects = projects.filter(p => p.ownerId === user.id);
+      const published = userProjects.filter(p => p.status === 'published').length;
+      const totalRaised = userProjects.reduce((sum, p) => sum + p.currentAmount, 0);
+      const totalGoal = userProjects.reduce((sum, p) => sum + p.fundingGoal, 0);
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Total Proyectos</div>
+            <div style="font-size: 24px; font-weight: 700;">${userProjects.length}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Publicados</div>
+            <div style="font-size: 24px; font-weight: 700;">${published}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Total Recaudado</div>
+            <div style="font-size: 24px; font-weight: 700;">$${totalRaised.toLocaleString()}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Meta Total</div>
+            <div style="font-size: 24px; font-weight: 700;">$${totalGoal.toLocaleString()}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function filterProjects() {
+      const user = getCurrentUser();
+      const statusFilter = document.getElementById('statusFilter').value;
+      let userProjects = projects.filter(p => p.ownerId === user.id);
+
+      if (statusFilter !== 'all') {
+        userProjects = userProjects.filter(p => p.status === statusFilter);
+      }
+
+      const container = document.getElementById('projectsList');
+      
+      if (userProjects.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="card-content text-center" style="padding: 80px 20px;">
+              <p class="text-muted mb-4">
+                ${statusFilter === 'all' ? 'No tienes proyectos creados todavía.' : 'No tienes proyectos con este estado.'}
+              </p>
+              <button class="btn btn-primary">+ Crear mi Primer Proyecto</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = userProjects.map(project => {
+        const progress = (project.currentAmount / project.fundingGoal * 100).toFixed(1);
+        const projectDonations = donations.filter(d => d.projectId === project.id);
+        const daysLeft = getDaysLeft(project.deadline);
+
+        return `
+          <div class="card mb-4">
+            <div class="card-header">
+              <div class="flex justify-between items-start">
+                <div style="flex: 1;">
+                  <div class="flex items-center gap-2 mb-2">
+                    <h3 style="font-size: 18px; font-weight: 600;">${project.title}</h3>
+                    ${getStatusBadge(project.status)}
+                    ${project.status === 'published' ? getCampaignStatusBadge(project.campaignStatus) : ''}
+                  </div>
+                  ${project.observations ? `
+                    <div class="alert alert-warning mt-2">
+                      <p class="text-sm" style="font-weight: 500; margin-bottom: 4px;">Observaciones:</p>
+                      ${project.observations.map(obs => `<p class="text-sm">• ${obs}</p>`).join('')}
+                    </div>
+                  ` : ''}
+                </div>
+                <img src="${project.image}" alt="${project.title}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;">
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="mb-4">
+                <div class="flex justify-between text-sm mb-2">
+                  <span>Progreso de financiación</span>
+                  <span>${progress}%</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar" style="width: ${progress}%"></div>
+                </div>
+                <div class="flex justify-between text-sm text-muted mt-2">
+                  <span>$${project.currentAmount.toLocaleString()} recaudados</span>
+                  <span>Meta: $${project.fundingGoal.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-4 text-sm mb-4">
+                <div>
+                  <div class="text-muted">Contribuidores</div>
+                  <div style="font-weight: 600;">${projectDonations.length}</div>
+                </div>
+                <div>
+                  <div class="text-muted">Días restantes</div>
+                  <div style="font-weight: 600;">${daysLeft > 0 ? daysLeft : 'Finalizado'}</div>
+                </div>
+                <div>
+                  <div class="text-muted">Categoría</div>
+                  <div style="font-weight: 600;">${project.category}</div>
+                </div>
+              </div>
+
+              <div class="flex gap-2 flex-wrap">
+                <a href="project-detail.html?id=${project.id}" class="btn btn-outline btn-sm">Ver Detalle</a>
+                ${project.status === 'draft' || project.status === 'observed' ? `
+                  <button class="btn btn-outline btn-sm">Editar</button>
+                ` : ''}
+                ${project.status === 'draft' ? `
+                  <button class="btn btn-outline btn-sm">Enviar para Revisión</button>
+                  <button class="btn btn-outline btn-sm" style="color: var(--destructive);">Eliminar</button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

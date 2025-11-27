@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crowdfunding - Financia el Futuro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav id="mainNav">
+        <a href="index.html" class="active">Inicio</a>
+        <a href="projects.html">Proyectos</a>
+        <a href="login.html" class="btn btn-primary">Iniciar Sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="hero">
+        <h1>Financia el Futuro</h1>
+        <p>Descubre proyectos innovadores y ayuda a convertir ideas extraordinarias en realidad. O comparte tu propia visión con el mundo.</p>
+        <div class="flex gap-4" style="justify-content: center; flex-wrap: wrap;">
+          <a href="projects.html" class="btn btn-primary btn-lg">Explorar Proyectos →</a>
+          <a href="register.html" class="btn btn-outline btn-lg">Crear Proyecto</a>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div class="grid grid-cols-3">
+          <div class="stat-item">
+            <div class="stat-value">2,847</div>
+            <div class="stat-label">Proyectos Financiados</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">$12.5M</div>
+            <div class="stat-label">Meta Total Alcanzada</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">67%</div>
+            <div class="stat-label">Tasa de Éxito</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <div class="text-center mb-6">
+          <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Explora por Categoría</h2>
+          <p class="text-muted">Encuentra proyectos que se alineen con tus intereses y pasiones</p>
+        </div>
+        <div class="grid grid-cols-3" id="categoriesGrid">
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 8px;">Proyectos Destacados</h2>
+            <p class="text-muted">Descubre los proyectos más prometedores de nuestra comunidad</p>
+          </div>
+          <a href="projects.html" class="btn btn-outline">Ver Todos →</a>
+        </div>
+        <div class="grid grid-cols-3" id="featuredProjects">
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <div class="text-center mb-6">
+          <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">¿Cómo Funciona?</h2>
+          <p class="text-muted">Financiar proyectos nunca había sido tan simple</p>
+        </div>
+        <div class="grid grid-cols-3">
+          <div class="text-center">
+            <div style="width: 64px; height: 64px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-weight: 700; font-size: 24px;">1</div>
+            <h3 style="font-weight: 600; margin-bottom: 12px;">Explora Proyectos</h3>
+            <p class="text-muted text-sm">Navega por cientos de proyectos innovadores en diferentes categorías</p>
+          </div>
+          <div class="text-center">
+            <div style="width: 64px; height: 64px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-weight: 700; font-size: 24px;">2</div>
+            <h3 style="font-weight: 600; margin-bottom: 12px;">Apoya Ideas</h3>
+            <p class="text-muted text-sm">Contribuye con la cantidad que desees a los proyectos que te inspiren</p>
+          </div>
+          <div class="text-center">
+            <div style="width: 64px; height: 64px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: white; font-weight: 700; font-size: 24px;">3</div>
+            <h3 style="font-weight: 600; margin-bottom: 12px;">Haz Realidad</h3>
+            <p class="text-muted text-sm">Sé parte del éxito y recibe actualizaciones del progreso del proyecto</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-6">
+        <div class="text-center mb-6">
+          <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 12px;">Preguntas Frecuentes</h2>
+          <p class="text-muted">Todo lo que necesitas saber sobre nuestra plataforma</p>
+        </div>
+        <div class="grid grid-cols-2">
+          <div class="card">
+            <div class="card-content">
+              <h3 style="font-weight: 600; margin-bottom: 12px;">¿Cómo funciona el crowdfunding?</h3>
+              <p class="text-muted text-sm">Los emprendedores publican sus proyectos con una meta de financiación. Las personas pueden contribuir con dinero para apoyar los proyectos que les interesan.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <h3 style="font-weight: 600; margin-bottom: 12px;">¿Qué pasa si un proyecto no alcanza su meta?</h3>
+              <p class="text-muted text-sm">Si un proyecto no alcanza su meta de financiación antes de la fecha límite, el dinero es devuelto a todos los contribuyentes.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <h3 style="font-weight: 600; margin-bottom: 12px;">¿Cómo puedo publicar mi proyecto?</h3>
+              <p class="text-muted text-sm">Primero debes registrarte y activar tu cuenta. Luego puedes crear un proyecto, completar todos los datos requeridos y enviarlo para aprobación.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <h3 style="font-weight: 600; margin-bottom: 12px;">¿Es seguro invertir en estos proyectos?</h3>
+              <p class="text-muted text-sm">Todos los proyectos pasan por un proceso de revisión. Sin embargo, como en cualquier inversión, existe riesgo y no garantizamos el retorno.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="background: var(--primary); border-radius: 8px; padding: 64px 32px; text-align: center; color: white;">
+        <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px;">¿Tienes una Idea Innovadora?</h2>
+        <p style="margin-bottom: 32px; font-size: 18px; opacity: 0.9;">Únete a miles de emprendedores que han convertido sus sueños en realidad gracias al apoyo de nuestra comunidad.</p>
+        <a href="register.html" class="btn btn-lg" style="background: white; color: var(--primary);">Comenzar Ahora →</a>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+  (function(){
+  if (typeof window.logout !== 'function') window.logout = function(){};
+
+    function _getNavUser(){
+      if (typeof getCurrentUser === 'function'){
+        try{ const u = getCurrentUser(); if (u) return u; }catch(e){}
+      }
+      return { name: 'Usuario Demo', email: 'demo@ejemplo.com', role: 'user' };
+    }
+
+    window.updateNavigation = function(){
+      const nav = document.getElementById('mainNav'); if (!nav) return;
+      const user = _getNavUser();
+      if (!user){
+        nav.innerHTML = `
+          <a href="index.html">Inicio</a>
+          <a href="projects.html">Proyectos</a>
+          <a href="login.html" class="btn btn-primary">Iniciar Sesión</a>
+        `;
+      } else if (user.role === 'admin'){
+        nav.innerHTML = `
+          <a href="index.html">Inicio</a>
+          <a href="projects.html">Proyectos</a>
+          <a href="admin-projects.html">Gestión Proyectos</a>
+          <a href="admin-users.html">Gestión Usuarios</a>
+          <div class="user-menu">
+            <button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button>
+            <div class="dropdown-menu" id="userDropdown">
+              <span class="dropdown-item" style="font-weight: 600; cursor: default;">Administrador</span>
+              <div class="separator" style="margin: 8px 0;"></div>
+              <a href="favorites.html" class="dropdown-item">Favoritos</a>
+              <a href="my-donations.html" class="dropdown-item">Mis Aportes</a>
+              <div class="separator" style="margin: 8px 0;"></div>
+              <span class="dropdown-item" onclick="logout()">Cerrar Sesión</span>
+            </div>
+          </div>
+        `;
+      } else {
+        nav.innerHTML = `
+          <a href="index.html">Inicio</a>
+          <a href="projects.html">Proyectos</a>
+          <a href="my-projects.html">Mis Proyectos</a>
+          <div class="user-menu">
+            <button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button>
+            <div class="dropdown-menu" id="userDropdown">
+              <span class="dropdown-item" style="font-weight: 600; cursor: default;">${user.email}</span>
+              <div class="separator" style="margin: 8px 0;"></div>
+              <a href="my-projects.html" class="dropdown-item">Mis Proyectos</a>
+              <a href="my-donations.html" class="dropdown-item">Mis Aportes</a>
+              <a href="favorites.html" class="dropdown-item">Favoritos</a>
+              <div class="separator" style="margin: 8px 0;"></div>
+              <span class="dropdown-item" onclick="logout()">Cerrar Sesión</span>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    window.toggleUserMenu = function(){ const dropdown = document.getElementById('userDropdown'); if (dropdown) dropdown.classList.toggle('active'); };
+
+    document.addEventListener('click', function(e){ const userMenu = document.querySelector('.user-menu'); const dropdown = document.getElementById('userDropdown'); if (userMenu && dropdown && !userMenu.contains(e.target)) dropdown.classList.remove('active'); });
+
+    window.toggleFavorite = function(projectId){ if (!Array.isArray(window.projects)) return; const p = projects.find(p=>p.id===projectId); if (p) p.isFavorite = !p.isFavorite; };
+
+    window.formatDate = function(dateString){ try{ const d = new Date(dateString); return d.toLocaleDateString('es-ES',{ year: 'numeric', month: 'long', day: 'numeric' }); }catch(e){ return dateString; } };
+
+    window.getDaysLeft = function(deadlineString){ try{ const deadline = new Date(deadlineString); const today = new Date(); const diffTime = deadline - today; return Math.ceil(diffTime/(1000*60*60*24)); }catch(e){ return 0; } };
+
+    window.getStatusBadge = function(status){ const statusMap = { draft: { label: 'Borrador', class: 'badge-secondary' }, under_review: { label: 'En Revisión', class: 'badge-primary' }, published: { label: 'Publicado', class: 'badge-success' }, observed: { label: 'Observado', class: 'badge-warning' }, rejected: { label: 'Rechazado', class: 'badge-destructive' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+
+    window.getCampaignStatusBadge = function(status){ const statusMap = { not_started: { label: 'No Iniciada', class: 'badge-secondary' }, in_progress: { label: 'En Progreso', class: 'badge-success' }, paused: { label: 'En Pausa', class: 'badge-warning' }, finished: { label: 'Finalizada', class: 'badge-secondary' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+
+    window.requireAuth = function(){ return true; };
+    window.requireAdmin = function(){ return true; };
+  })();
+  </script>
+  <script>
+    updateNavigation();
+    
+    function loadCategories() {
+      const grid = document.getElementById('categoriesGrid');
+      categories.forEach(cat => {
+        const count = projects.filter(p => p.category === cat.name && p.status === 'published').length;
+        grid.innerHTML += `
+          <div class="card" style="cursor: pointer;" onclick="window.location.href='projects.html'">
+            <div class="card-content text-center">
+              <h3 style="font-weight: 600; margin-bottom: 8px;">${cat.name}</h3>
+              <p class="text-sm text-muted">${count} proyectos</p>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function loadFeaturedProjects() {
+      const grid = document.getElementById('featuredProjects');
+      const featured = projects.filter(p => p.status === 'published').slice(0, 6);
+      
+      featured.forEach(project => {
+        const progress = (project.currentAmount / project.fundingGoal * 100).toFixed(0);
+        grid.innerHTML += `
+          <div class="project-card" onclick="window.location.href='project-detail.html?id=${project.id}'">
+            <img src="${project.image}" alt="${project.title}" class="project-image">
+            <div class="project-body">
+              <div class="project-category">
+                <span class="badge badge-outline">${project.category}</span>
+              </div>
+              <h3 class="project-title">${project.title}</h3>
+              <p class="project-description">${project.description}</p>
+              <div class="progress">
+                <div class="progress-bar" style="width: ${progress}%"></div>
+              </div>
+              <div class="project-stats mt-2">
+                <span style="font-weight: 600; color: var(--primary);">$${project.currentAmount.toLocaleString()}</span>
+                <span class="text-muted text-sm">${progress}% financiado</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    loadCategories();
+    loadFeaturedProjects();
+  </script>
+</body>
+</html>

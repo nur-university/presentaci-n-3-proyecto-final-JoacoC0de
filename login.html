@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Crowdfunding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav>
+        <a href="index.html">Inicio</a>
+        <a href="projects.html">Proyectos</a>
+        <a href="register.html">Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="card" style="max-width: 500px; margin: 40px auto;">
+        <div class="card-header text-center">
+          <h1 class="card-title">Iniciar Sesión</h1>
+          <p class="text-muted text-sm mt-2">Accede a tu cuenta para gestionar tus proyectos y contribuciones</p>
+        </div>
+        <div class="card-content">
+          <div class="mb-6">
+            <p class="text-sm mb-2" style="font-weight: 500;">Acceso rápido para demostración:</p>
+            <div class="flex flex-col gap-2">
+              <button class="btn btn-outline" onclick="quickLogin('juan.perez@email.com')" style="justify-content: flex-start; text-align: left;">
+                <div>
+                  <div style="font-weight: 500;">juan.perez@email.com</div>
+                  <div class="text-xs text-muted">Usuario</div>
+                </div>
+              </button>
+              <button class="btn btn-outline" onclick="quickLogin('maria.garcia@email.com')" style="justify-content: flex-start; text-align: left;">
+                <div>
+                  <div style="font-weight: 500;">maria.garcia@email.com</div>
+                  <div class="text-xs text-muted">Usuario</div>
+                </div>
+              </button>
+              <button class="btn btn-outline" onclick="quickLogin('admin@crowdfunding.com')" style="justify-content: flex-start; text-align: left;">
+                <div>
+                  <div style="font-weight: 500;">admin@crowdfunding.com</div>
+                  <div class="text-xs text-muted">Administrador</div>
+                </div>
+              </button>
+              <button class="btn btn-outline" onclick="quickLogin('carlos.lopez@email.com')" style="justify-content: flex-start; text-align: left;">
+                <div>
+                  <div style="font-weight: 500;">carlos.lopez@email.com</div>
+                  <div class="text-xs text-muted">Usuario (Inactivo)</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="separator"></div>
+
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="label" for="email">Correo Electrónico</label>
+              <input type="email" id="email" class="input" placeholder="tu@email.com" required>
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="password">Contraseña</label>
+              <input type="password" id="password" class="input" placeholder="Tu contraseña" required>
+            </div>
+
+            <div id="errorMessage" class="alert alert-error hidden"></div>
+
+            <button type="submit" class="btn btn-primary w-full">Iniciar Sesión</button>
+          </form>
+
+          <div class="text-center mt-4">
+            <p class="text-sm">
+              ¿No tienes cuenta? 
+              <a href="register.html" style="color: var(--primary); text-decoration: none; font-weight: 500;">Regístrate aquí</a>
+            </p>
+          </div>
+
+          <div class="text-center mt-2">
+            <a href="#" class="text-sm text-muted" style="text-decoration: none;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="max-width: 500px; margin: 24px auto; background: #eff6ff; border-color: #bfdbfe;">
+        <div class="card-content">
+          <h4 style="font-weight: 500; color: #1e40af; margin-bottom: 12px;">Información de Demostración</h4>
+          <ul class="text-sm" style="color: #1e40af; list-style: none;">
+            <li>• Usa los botones de "Acceso rápido" para probar diferentes tipos de usuario</li>
+            <li>• Admin: gestiona proyectos y usuarios</li>
+            <li>• Usuario: crea proyectos y realiza donaciones</li>
+            <li>• El usuario inactivo no puede iniciar sesión</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+    function quickLogin(email) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = '123456';
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('errorMessage');
+      
+      errorDiv.classList.add('hidden');
+      
+      const user = users.find(u => u.email === email);
+      
+      if (!user) {
+        errorDiv.textContent = 'Usuario no encontrado';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      if (!user.isActive) {
+        errorDiv.textContent = 'Tu cuenta no está activada. Revisa tu email para activarla.';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      if (password.length < 6) {
+        errorDiv.textContent = 'La contraseña debe tener al menos 6 caracteres';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      setCurrentUser(user);
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

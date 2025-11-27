@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Aportes - Crowdfunding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav id="mainNav"></nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="flex items-center gap-3 mb-6">
+        <span style="font-size: 32px;">💰</span>
+        <div>
+          <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 4px;">Mis Aportes</h1>
+          <p class="text-muted">Historial de todas tus contribuciones a proyectos</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4 mb-6" id="statsGrid"></div>
+
+      <div class="flex items-center gap-4 mb-6">
+        <span class="text-sm" style="font-weight: 500;">Ordenar por:</span>
+        <select id="sortBy" class="select" style="width: 250px;" onchange="loadDonations()">
+          <option value="recent">Más recientes</option>
+          <option value="amount_high">Cantidad (Mayor a menor)</option>
+          <option value="amount_low">Cantidad (Menor a mayor)</option>
+          <option value="project">Proyecto (A-Z)</option>
+        </select>
+      </div>
+
+      <div id="donationsList"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+  (function(){ if (typeof window.updateNavigation === 'function') return; 
+  if (typeof window.logout !== 'function') window.logout = function(){};
+    function _getNavUser(){ if (typeof getCurrentUser === 'function'){ try{ const u = getCurrentUser(); if (u) return u; }catch(e){} } return { name: 'Usuario Demo', email: 'demo@ejemplo.com', role: 'user' }; }
+    window.updateNavigation = function(){ const nav = document.getElementById('mainNav'); if (!nav) return; const user = _getNavUser(); if (!user){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="login.html" class="btn btn-primary">Iniciar Sesión</a>`; } else if (user.role === 'admin'){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="admin-projects.html">Gestión Proyectos</a><a href="admin-users.html">Gestión Usuarios</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">Administrador</span><div class="separator" style="margin: 8px 0;"></div><a href="favorites.html" class="dropdown-item">Favoritos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } else { nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="my-projects.html">Mis Proyectos</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">${user.email}</span><div class="separator" style="margin: 8px 0;"></div><a href="my-projects.html" class="dropdown-item">Mis Proyectos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><a href="favorites.html" class="dropdown-item">Favoritos</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } };
+    window.toggleUserMenu = function(){ const dropdown = document.getElementById('userDropdown'); if (dropdown) dropdown.classList.toggle('active'); };
+    document.addEventListener('click', function(e){ const userMenu = document.querySelector('.user-menu'); const dropdown = document.getElementById('userDropdown'); if (userMenu && dropdown && !userMenu.contains(e.target)) dropdown.classList.remove('active'); });
+    window.toggleFavorite = function(projectId){ if (!Array.isArray(window.projects)) return; const p = projects.find(p=>p.id===projectId); if (p) p.isFavorite = !p.isFavorite; };
+    window.formatDate = function(dateString){ try{ const d = new Date(dateString); return d.toLocaleDateString('es-ES',{ year: 'numeric', month: 'long', day: 'numeric' }); }catch(e){ return dateString; } };
+    window.getDaysLeft = function(deadlineString){ try{ const deadline = new Date(deadlineString); const today = new Date(); const diffTime = deadline - today; return Math.ceil(diffTime/(1000*60*60*24)); }catch(e){ return 0; } };
+    window.getStatusBadge = function(status){ const statusMap = { draft: { label: 'Borrador', class: 'badge-secondary' }, under_review: { label: 'En Revisión', class: 'badge-primary' }, published: { label: 'Publicado', class: 'badge-success' }, observed: { label: 'Observado', class: 'badge-warning' }, rejected: { label: 'Rechazado', class: 'badge-destructive' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.getCampaignStatusBadge = function(status){ const statusMap = { not_started: { label: 'No Iniciada', class: 'badge-secondary' }, in_progress: { label: 'En Progreso', class: 'badge-success' }, paused: { label: 'En Pausa', class: 'badge-warning' }, finished: { label: 'Finalizada', class: 'badge-secondary' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.requireAuth = function(){ return true; };
+    window.requireAdmin = function(){ return true; };
+  })();
+  </script>
+  <script>
+    function initPage() {
+      if (!requireAuth()) return;
+      updateNavigation();
+      renderStats();
+      loadDonations();
+    }
+
+    function renderStats() {
+      const user = getCurrentUser();
+      const userDonations = donations.filter(d => d.userId === user.id);
+      const totalAmount = userDonations.reduce((sum, d) => sum + d.amount, 0);
+      const uniqueProjects = new Set(userDonations.map(d => d.projectId)).size;
+      const avg = userDonations.length > 0 ? Math.round(totalAmount / userDonations.length) : 0;
+
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="card" style="background: #dcfce7; border-color: #22c55e;">
+          <div class="card-content">
+            <div class="text-sm mb-2" style="color: #166534;">Total Aportado</div>
+            <div style="font-size: 24px; font-weight: 700; color: #166534;">$${totalAmount.toLocaleString()}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Total Aportes</div>
+            <div style="font-size: 24px; font-weight: 700;">${userDonations.length}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Proyectos Apoyados</div>
+            <div style="font-size: 24px; font-weight: 700;">${uniqueProjects}</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-content">
+            <div class="text-sm text-muted mb-2">Promedio por Aporte</div>
+            <div style="font-size: 24px; font-weight: 700;">$${avg.toLocaleString()}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function loadDonations() {
+      const user = getCurrentUser();
+      const sortBy = document.getElementById('sortBy').value;
+      let userDonations = donations.filter(d => d.userId === user.id);
+
+      userDonations.sort((a, b) => {
+        switch (sortBy) {
+          case 'recent':
+            return new Date(b.date) - new Date(a.date);
+          case 'amount_high':
+            return b.amount - a.amount;
+          case 'amount_low':
+            return a.amount - b.amount;
+          case 'project':
+            return a.projectTitle.localeCompare(b.projectTitle);
+          default:
+            return 0;
+        }
+      });
+
+      const container = document.getElementById('donationsList');
+
+      if (userDonations.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="card-content text-center" style="padding: 80px 20px;">
+              <div style="font-size: 64px; margin-bottom: 16px;">💰</div>
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">No has realizado aportes</h3>
+              <p class="text-muted mb-6">Explora proyectos y apoya aquellos que te inspiren para hacer un impacto positivo.</p>
+              <a href="projects.html" class="btn btn-primary">📊 Explorar Proyectos</a>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = userDonations.map(donation => `
+        <div class="card mb-4">
+          <div class="card-header">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${donation.projectTitle}</h3>
+                <div class="flex gap-2">
+                  <span class="badge badge-outline">${formatDate(donation.date)}</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <div style="font-size: 24px; font-weight: 700; color: #166534;">$${donation.amount.toLocaleString()}</div>
+                <div class="text-sm text-muted">Aporte realizado</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-content">
+            ${donation.message ? `
+              <div style="background: var(--muted); padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+                <div class="flex gap-2">
+                  <span aria-hidden="true"></span>
+                  <div>
+                    <p class="text-sm" style="font-weight: 500; margin-bottom: 4px;">Tu mensaje:</p>
+                    <p class="text-sm" style="font-style: italic;">"${donation.message}"</p>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            <a href="project-detail.html?id=${donation.projectId}" class="btn btn-outline btn-sm">Ver Proyecto</a>
+          </div>
+        </div>
+      `).join('');
+
+      if (userDonations.length > 0) {
+        const stats = renderStats();
+        const totalAmount = userDonations.reduce((sum, d) => sum + d.amount, 0);
+        const uniqueProjects = new Set(userDonations.map(d => d.projectId)).size;
+        
+        container.innerHTML += `
+          <div class="card" style="background: #dcfce7; border-color: #22c55e;">
+            <div class="card-content">
+              <h3 style="font-weight: 600; color: #166534; margin-bottom: 16px;">¡Gracias por tu apoyo!</h3>
+              <p class="text-sm" style="color: #166534;">
+                Con tus ${userDonations.length} aportes has contribuido con un total de 
+                <span style="font-weight: 700;">$${totalAmount.toLocaleString()}</span> para hacer 
+                realidad ${uniqueProjects} proyecto${uniqueProjects !== 1 ? 's' : ''}. 
+                Tu apoyo hace la diferencia en la vida de muchas personas.
+              </p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

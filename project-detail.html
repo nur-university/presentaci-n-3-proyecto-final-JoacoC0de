@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del Proyecto - Crowdfunding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Crowdfunding</a>
+      <nav id="mainNav"></nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="projects.html">Proyectos</a>
+        <span>/</span>
+        <span id="breadcrumbTitle">...</span>
+      </div>
+
+      <div id="projectContent"></div>
+
+      <div id="notFound" class="text-center hidden" style="padding: 80px 0;">
+        <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 16px;">Proyecto no encontrado</h2>
+        <a href="projects.html" class="btn btn-primary">Volver a proyectos</a>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="donationModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Contribuir al Proyecto</h2>
+        <button class="modal-close" onclick="closeDonationModal()">×</button>
+      </div>
+      <div>
+        <div class="form-group">
+          <label class="label">Cantidad a contribuir</label>
+          <input type="number" id="donationAmount" class="input" placeholder="0" min="1">
+        </div>
+
+        <div class="form-group">
+          <label class="label">Cantidades sugeridas</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="btn btn-outline btn-sm" onclick="setAmount(50)">$50</button>
+            <button class="btn btn-outline btn-sm" onclick="setAmount(100)">$100</button>
+            <button class="btn btn-outline btn-sm" onclick="setAmount(250)">$250</button>
+            <button class="btn btn-outline btn-sm" onclick="setAmount(500)">$500</button>
+            <button class="btn btn-outline btn-sm" onclick="setAmount(1000)">$1000</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label">Mensaje (opcional)</label>
+          <textarea id="donationMessage" class="textarea" rows="3" placeholder="Deja un mensaje de apoyo..."></textarea>
+        </div>
+
+        <div class="flex gap-2">
+          <button class="btn btn-outline" style="flex: 1;" onclick="closeDonationModal()">Cancelar</button>
+          <button class="btn btn-primary" style="flex: 1;" onclick="submitDonation()">Contribuir <span id="donationAmountBtn">$0</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Crowdfunding Platform. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script>
+  (function(){ if (typeof window.updateNavigation === 'function') return; 
+  if (typeof window.logout !== 'function') window.logout = function(){};
+    function _getNavUser(){ if (typeof getCurrentUser === 'function'){ try{ const u = getCurrentUser(); if (u) return u; }catch(e){} } return { name: 'Usuario Demo', email: 'demo@ejemplo.com', role: 'user' }; }
+    window.updateNavigation = function(){ const nav = document.getElementById('mainNav'); if (!nav) return; const user = _getNavUser(); if (!user){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="login.html" class="btn btn-primary">Iniciar Sesión</a>`; } else if (user.role === 'admin'){ nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="admin-projects.html">Gestión Proyectos</a><a href="admin-users.html">Gestión Usuarios</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">Administrador</span><div class="separator" style="margin: 8px 0;"></div><a href="favorites.html" class="dropdown-item">Favoritos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } else { nav.innerHTML = `<a href="index.html">Inicio</a><a href="projects.html">Proyectos</a><a href="my-projects.html">Mis Proyectos</a><div class="user-menu"><button class="btn btn-outline" onclick="toggleUserMenu()">${user.name} ▼</button><div class="dropdown-menu" id="userDropdown"><span class="dropdown-item" style="font-weight: 600; cursor: default;">${user.email}</span><div class="separator" style="margin: 8px 0;"></div><a href="my-projects.html" class="dropdown-item">Mis Proyectos</a><a href="my-donations.html" class="dropdown-item">Mis Aportes</a><a href="favorites.html" class="dropdown-item">Favoritos</a><div class="separator" style="margin: 8px 0;"></div><span class="dropdown-item" onclick="logout()">Cerrar Sesión</span></div></div>`; } };
+    window.toggleUserMenu = function(){ const dropdown = document.getElementById('userDropdown'); if (dropdown) dropdown.classList.toggle('active'); };
+    document.addEventListener('click', function(e){ const userMenu = document.querySelector('.user-menu'); const dropdown = document.getElementById('userDropdown'); if (userMenu && dropdown && !userMenu.contains(e.target)) dropdown.classList.remove('active'); });
+    window.toggleFavorite = function(projectId){ if (!Array.isArray(window.projects)) return; const p = projects.find(p=>p.id===projectId); if (p) p.isFavorite = !p.isFavorite; };
+    window.formatDate = function(dateString){ try{ const d = new Date(dateString); return d.toLocaleDateString('es-ES',{ year: 'numeric', month: 'long', day: 'numeric' }); }catch(e){ return dateString; } };
+    window.getDaysLeft = function(deadlineString){ try{ const deadline = new Date(deadlineString); const today = new Date(); const diffTime = deadline - today; return Math.ceil(diffTime/(1000*60*60*24)); }catch(e){ return 0; } };
+    window.getStatusBadge = function(status){ const statusMap = { draft: { label: 'Borrador', class: 'badge-secondary' }, under_review: { label: 'En Revisión', class: 'badge-primary' }, published: { label: 'Publicado', class: 'badge-success' }, observed: { label: 'Observado', class: 'badge-warning' }, rejected: { label: 'Rechazado', class: 'badge-destructive' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.getCampaignStatusBadge = function(status){ const statusMap = { not_started: { label: 'No Iniciada', class: 'badge-secondary' }, in_progress: { label: 'En Progreso', class: 'badge-success' }, paused: { label: 'En Pausa', class: 'badge-warning' }, finished: { label: 'Finalizada', class: 'badge-secondary' } }; const info = statusMap[status] || { label: status, class: 'badge-secondary' }; return `<span class="badge ${info.class}">${info.label}</span>`; };
+    window.requireAuth = function(){ return true; };
+    window.requireAdmin = function(){ return true; };
+  })();
+  </script>
+  <script>
+    let currentProject = null;
+
+    function initPage() {
+      updateNavigation();
+      loadProject();
+    }
+
+    function loadProject() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const projectId = urlParams.get('id');
+
+      if (!projectId) {
+        showNotFound();
+        return;
+      }
+
+      const project = projects.find(p => p.id === projectId);
+
+      if (!project) {
+        showNotFound();
+        return;
+      }
+
+      currentProject = project;
+      document.getElementById('breadcrumbTitle').textContent = project.title;
+      renderProject(project);
+    }
+
+    function showNotFound() {
+      document.getElementById('notFound').classList.remove('hidden');
+    }
+
+    function renderProject(project) {
+      const progress = (project.currentAmount / project.fundingGoal * 100).toFixed(0);
+      const daysLeft = getDaysLeft(project.deadline);
+      const projectDonations = donations.filter(d => d.projectId === project.id);
+
+      const content = document.getElementById('projectContent');
+      content.innerHTML = `
+        <div class="grid grid-cols-3 gap-6">
+          <div style="grid-column: span 2;">
+            <img src="${project.image}" alt="${project.title}" style="width: 100%; height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 24px;">
+
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <span class="badge badge-outline">${project.category}</span>
+                <h1 style="font-size: 32px; font-weight: 700; margin: 12px 0 8px;">${project.title}</h1>
+                <p class="text-muted">${project.description}</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="btn btn-outline btn-sm" onclick="toggleProjectFavorite()">
+                  ${project.isFavorite ? '❤️' : '🤍'}
+                </button>
+                <button class="btn btn-outline btn-sm">🔗</button>
+              </div>
+            </div>
+
+            <div class="card mb-6">
+              <div class="card-content">
+                <div class="flex items-center gap-4">
+                  <div style="width: 48px; height: 48px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                    ${project.ownerName.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 style="font-weight: 600;">${project.ownerName}</h3>
+                    <p class="text-sm text-muted">Creador del proyecto</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-6">
+              <div class="card-header">
+                <h3 style="font-weight: 600;">Descripción del Proyecto</h3>
+              </div>
+              <div class="card-content">
+                <p style="white-space: pre-line;">${project.detailedDescription || project.description}</p>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 style="font-weight: 600;">Contribuidores (${projectDonations.length})</h3>
+              </div>
+              <div class="card-content">
+                ${projectDonations.length === 0 ? `
+                  <p class="text-center text-muted" style="padding: 32px 0;">Sé el primero en apoyar este proyecto</p>
+                ` : projectDonations.map(donation => `
+                  <div style="display: flex; gap: 12px; padding: 12px; background: var(--muted); border-radius: 6px; margin-bottom: 8px;">
+                    <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; flex-shrink: 0;">
+                      ${donation.userName.charAt(0)}
+                    </div>
+                    <div style="flex: 1;">
+                      <div class="flex justify-between">
+                        <h4 style="font-weight: 500;">${donation.userName}</h4>
+                        <span style="font-weight: 600; color: var(--primary);">$${donation.amount.toLocaleString()}</span>
+                      </div>
+                      <p class="text-sm text-muted">${formatDate(donation.date)}</p>
+                      ${donation.message ? `<p class="text-sm mt-2" style="font-style: italic;">"${donation.message}"</p>` : ''}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="position: sticky; top: 80px;">
+              <div class="card-header text-center">
+                <div style="font-size: 32px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">
+                  $${project.currentAmount.toLocaleString()}
+                </div>
+                <div class="text-sm text-muted">de $${project.fundingGoal.toLocaleString()} meta</div>
+              </div>
+              <div class="card-content">
+                <div class="progress mb-6" style="height: 12px;">
+                  <div class="progress-bar" style="width: ${progress}%"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-center mb-6">
+                  <div>
+                    <div style="font-size: 24px; font-weight: 700;">${progress}%</div>
+                    <div class="text-sm text-muted">Financiado</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 24px; font-weight: 700;">${daysLeft > 0 ? daysLeft : 0}</div>
+                    <div class="text-sm text-muted">${daysLeft > 0 ? 'Días restantes' : 'Finalizado'}</div>
+                  </div>
+                </div>
+
+                <div class="text-center text-sm text-muted mb-6">
+                  📅 Termina el ${formatDate(project.deadline)}
+                </div>
+
+                <div class="separator mb-6"></div>
+
+                <div id="donationSuccess" class="alert alert-success hidden mb-4">
+                  <h4 style="font-weight: 600; margin-bottom: 4px;">¡Gracias por tu aporte!</h4>
+                  <p class="text-sm">Tu contribución ha sido procesada exitosamente.</p>
+                </div>
+
+                ${project.status !== 'published' ? `
+                  <div class="alert alert-warning mb-4">
+                    <h4 style="font-weight: 600; margin-bottom: 4px;">Proyecto no disponible</h4>
+                    <p class="text-sm">Este proyecto aún no está publicado o está en revisión.</p>
+                  </div>
+                ` : ''}
+
+                <button 
+                  class="btn btn-primary w-full btn-lg" 
+                  onclick="openDonationModal()"
+                  ${daysLeft <= 0 || project.campaignStatus !== 'in_progress' || project.status !== 'published' ? 'disabled' : ''}>
+                  💰 ${daysLeft <= 0 ? 'Campaña Finalizada' : 
+                      project.campaignStatus !== 'in_progress' ? 'Campaña No Activa' :
+                      project.status !== 'published' ? 'No Disponible' : 'Contribuir Ahora'}
+                </button>
+
+                ${!getCurrentUser() ? `
+                  <p class="text-xs text-muted text-center mt-2">
+                    Necesitas <a href="login.html" style="color: var(--primary); text-decoration: underline;">iniciar sesión</a> para contribuir
+                  </p>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleProjectFavorite() {
+      if (currentProject) {
+        toggleFavorite(currentProject.id);
+        loadProject();
+      }
+    }
+
+    function openDonationModal() {
+      const user = getCurrentUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      document.getElementById('donationModal').classList.add('active');
+    }
+
+    function closeDonationModal() {
+      document.getElementById('donationModal').classList.remove('active');
+      document.getElementById('donationAmount').value = '';
+      document.getElementById('donationMessage').value = '';
+      updateDonationBtn();
+    }
+
+    function setAmount(amount) {
+      document.getElementById('donationAmount').value = amount;
+      updateDonationBtn();
+    }
+
+    document.getElementById('donationAmount').addEventListener('input', updateDonationBtn);
+
+    function updateDonationBtn() {
+      const amount = document.getElementById('donationAmount').value || '0';
+      document.getElementById('donationAmountBtn').textContent = '$' + amount;
+    }
+
+    function submitDonation() {
+      const amount = parseFloat(document.getElementById('donationAmount').value);
+      const message = document.getElementById('donationMessage').value;
+
+      if (!amount || amount <= 0) {
+        alert('Por favor ingresa una cantidad válida');
+        return;
+      }
+
+      currentProject.currentAmount += amount;
+      
+      closeDonationModal();
+      document.getElementById('donationSuccess').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('donationSuccess').classList.add('hidden');
+      }, 5000);
+      
+      loadProject();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
